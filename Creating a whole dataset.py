@@ -1,4 +1,10 @@
 '''
+Run this file to output 'data' which contains one dataframe with house prices and 13 other columns
+'''
+
+
+
+'''
 Loading necessary packages and dependencies
 1) features = each row contains all the data about 1 house
 2) target = the target price for each house/row in features
