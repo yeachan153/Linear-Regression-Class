@@ -103,23 +103,26 @@ class LinearRegression(data,...): # LOOK UP how to write class & def (eg 'self)
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
-# Cannot use Rank 1 matrix in scikit learn
-X = x.reshape((m, 1))
-# Creating Model
-reg = LinearRegression()
-# Fitting training data
-reg = reg.fit(x, y)
-# Y Prediction
-Y_pred = reg.predict(x)
+def improvements():
+    # Cannot use Rank 1 matrix in scikit learn
+    X = x.reshape((m, 1))
 
-# Calculating RMSE and R2 Score
-mse = mean_squared_error(y, Y_pred)
-rmse = np.sqrt(mse)
-r2_score = reg.score(x,y)
+    # Creating Model
+    reg = LinearRegression()
 
-print(np.sqrt(mse))
-print(r2_score)
+    # Fitting training data
+    reg = reg.fit(x, y)
 
+    # Y Prediction
+    Y_pred = reg.predict(x)
+
+    # Calculating RMSE and R2 Score
+    mse = mean_squared_error(y, Y_pred)
+    rmse = np.sqrt(mse)
+    r2_score = reg.score(x,y)
+
+    print(np.sqrt(mse))
+    print(r2_score)
 
 
 #########################################
@@ -127,38 +130,38 @@ print(r2_score)
 # Option 1: Split data into training/testing sets:
 
 # Split the feature data into training/testing sets
-features_train = features[:-20]
-features_test = features[-20:]
+#features_train = features[:-20]
+#features_test = features[-20:]
 
 # Split the targets into training/testing sets
-target_train = target[:-20]
-target_test = target[-20:]
+#target_train = target[:-20]
+#target_test = target[-20:]
 
 # Create linear regression object
-regr = linear_model.LinearRegression()
+#regr = linear_model.LinearRegression()
 
 # Train the model using the training sets
-regr.fit(features_train, target_train)
+#regr.fit(features_train, target_train)
 
 # Make predictions using the testing set
-features_pred = regr.predict(features_test)
+#features_pred = regr.predict(features_test)
 
 # The coefficients
-print('Coefficients: \n', regr.coef_)
+#print('Coefficients: \n', regr.coef_)
 # The mean squared error
-print("Mean squared error: %.2f"
-      % mean_squared_error(target_test, features_pred))
+#print("Mean squared error: %.2f"
+#      % mean_squared_error(target_test, features_pred))
 # Explained variance score: 1 is perfect prediction
-print('Variance score: %.2f' % r2_score(target_test, features_pred))
+#print('Variance score: %.2f' % r2_score(target_test, features_pred))
 
 # Plot outputs
-plt.scatter(features_test, target_test,  color='black')
-plt.plot(features_test, feature_pred, color='blue', linewidth=1)
+#plt.scatter(features_test, target_test,  color='black')
+#plt.plot(features_test, feature_pred, color='blue', linewidth=1)
 
-plt.xticks(())
-plt.yticks(())
+#plt.xticks(())
+#plt.yticks(())
 
-plt.show()
+#plt.show()
 
 ### OPTION 2
 #  make a dataframe from all info needed first
@@ -166,7 +169,7 @@ plt.show()
 
 from sklearn import train_test_split
 
-df_x = pd.DataFrame(boston.data, columns=boston.feature_names)
-df_y = pd.DataFrame(boston.target)
+#df_x = pd.DataFrame(boston.data, columns=boston.feature_names)
+#df_y = pd.DataFrame(boston.target)
 
 # https://www.youtube.com/watch?v=JTj-WgWLKFM
