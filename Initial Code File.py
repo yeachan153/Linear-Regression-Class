@@ -26,3 +26,4 @@ target.shape
 '''
 
 '''
+data.describe()
