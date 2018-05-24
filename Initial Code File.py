@@ -5,6 +5,7 @@ Loading necessary packages and dependencies
 3) boston.DESCR = codebook for dataset
 4) boston.feature_names = column names
 '''
+
 from sklearn import datasets
 boston = datasets.load_boston()
 features = boston.data
@@ -14,16 +15,16 @@ columns = boston.feature_names
 import pandas as pd
 
 '''
-Putting the data into pandas
+Putting the data into pandas and creating 1 dataset
 '''
 data = pd.DataFrame(features, columns = columns)
 target = pd.DataFrame(target)
+data['House Prices'] = target
 
-# Check both have equal rows!
-data.shape
-target.shape
+house_price = list(data)[-1]
+rest_of_columns = list(data)[:-1]
+columns = [house_price] + rest_of_columns
 
-'''
+data = pd.DataFrame(data, columns = columns)
 
-'''
-data.describe()
+
