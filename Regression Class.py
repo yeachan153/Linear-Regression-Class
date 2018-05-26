@@ -1,15 +1,15 @@
 '''
-NOTEs
+NOTES
 1) Consider changing self.data to self.features
+2) Should we normalise categorical values? If not, how do we implement this?
+3) Add error messages for predict function - e.g. if matrix multiplication is not possible.
 '''
+
 import pandas as pd
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
 
-'''
-Creating the regression class
-'''
 class LinearRegression(object):
     def __init__(self, data):
         self.data = copy.deepcopy(data)
@@ -33,8 +33,10 @@ class LinearRegression(object):
     def mean_normalise(self, method = 'range'):
         '''
         Run this to normalise the data if needed.
-        :param method: Either divides with the mean or the standard deviation of the column. Enter 'std' or 'range'.
-        :return: Returns self.data as a normalised dataset - useful if using gradient descent to minimise cost function
+        :param method: Either divides with the mean or the standard
+        deviation of the column. Enter 'std' or 'range'.
+        :return: Returns self.data as a normalised dataset - useful
+        if using gradient descent to minimise cost function
         '''
         for i in range(len(self.data.columns)):
             new_col = []
@@ -51,8 +53,19 @@ class LinearRegression(object):
     def train(self):
         pass
 
-    def predict(self):
-        pass
+    def predict(self, coefficients):
+        '''
+        Using self.data, we use matrix multiplication to multiply
+        against the coefficients matrix to yield predictions.
+        :param coefficients: Regression coefficients. MAKE SURE
+        THAT EACH COLUMN OF temp_data MATCHES THE COEFFICIENTS
+        IN THE COEFFICIENTS MATRIX!!
+        :return: Returns an n-dimensional vector of predicted values
+        '''
+        temp_data = copy.deepcopy(self.data)
+        temp_data.insert(0, 'Intercept Token', 1)
+        return np.dot(temp_data, coefficients)
+
 
 
 
