@@ -24,6 +24,9 @@ import pandas as pd
 Putting the data into pandas and creating 1 dataset
 '''
 data = pd.DataFrame(features, columns = columns)
+
+'''
+# Only use below if you want all datasets together
 target = pd.DataFrame(target)
 data['House Prices'] = target
 
@@ -32,5 +35,5 @@ rest_of_columns = list(data)[:-1]
 columns = [house_price] + rest_of_columns
 
 data = pd.DataFrame(data, columns = columns)
-
+'''
 
