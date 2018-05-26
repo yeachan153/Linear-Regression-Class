@@ -11,8 +11,9 @@ import copy
 import matplotlib.pyplot as plt
 
 class LinearRegression(object):
-    def __init__(self, data):
+    def __init__(self, data, dependent_var):
         self.data = copy.deepcopy(data)
+        self.targets = copy.deepcopy(dependent_var)
 
     def __repr__(self):
         return 'Linear Regression Class'
@@ -28,7 +29,16 @@ class LinearRegression(object):
         pass
 
     def gradient_descent(self):
-        pass
+        self.weights = np.ones(self.data)
+
+    def add_token_intercept(self):
+        '''
+        Adds 1's in column 0 of the data, in order for matrix multiplication
+        with intercept values to make sense. Only run after running mean_normalise
+        if mean_normalise is being run
+        :return: self.data now has a new column
+        '''
+        self.data.insert(0, 'Intercept Token', 1)
 
     def mean_normalise(self, method = 'range'):
         '''
@@ -50,9 +60,6 @@ class LinearRegression(object):
                     new_col.append(val_mean / std)
             self.data.iloc[:, i] = new_col
 
-    def train(self):
-        pass
-
     def predict(self, coefficients):
         '''
         Using self.data, we use matrix multiplication to multiply
@@ -62,9 +69,7 @@ class LinearRegression(object):
         IN THE COEFFICIENTS MATRIX!!
         :return: Returns an n-dimensional vector of predicted values
         '''
-        temp_data = copy.deepcopy(self.data)
-        temp_data.insert(0, 'Intercept Token', 1)
-        return np.dot(temp_data, coefficients)
+        return np.dot(self.data, coefficients)
 
 
 
