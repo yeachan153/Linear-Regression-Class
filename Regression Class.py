@@ -25,11 +25,24 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
-    def cost_function(self):
-        pass
+    def gradient_descent(self,iteration = 1e4, cost_function = True, eta = .0001):
+        '''
+        CHECK IF THIS WORKS!
+        :param iteration: Number of iterations to adjust weight
+        :param cost_function: Do you want the MSE values? Useful to plot
+        :param eta: Eta value - like a K-Factor in ELO
+        '''
+        self.sample_size = self.data.shape[0]
+        self.weights = np.ones(self.data.shape[1])
 
-    def gradient_descent(self):
-        self.weights = np.ones(self.data)
+        for i in range(int(iteration)):
+            predictions = np.dot(self.data, self.weights)
+            raw_error = self.targets - predictions
+            if cost_function == True:
+                self.MSE = []
+                self.MSE.append(((predictions - raw_error)**2) / len(self.targets))
+            self.weights += eta / self.data.shape[0] * np.dot(raw_error, self.data)
+
 
     def add_token_intercept(self):
         '''
@@ -62,6 +75,7 @@ class LinearRegression(object):
 
     def predict(self, coefficients):
         '''
+        TEST THIS!
         Using self.data, we use matrix multiplication to multiply
         against the coefficients matrix to yield predictions.
         :param coefficients: Regression coefficients. MAKE SURE
@@ -70,9 +84,6 @@ class LinearRegression(object):
         :return: Returns an n-dimensional vector of predicted values
         '''
         return np.dot(self.data, coefficients)
-
-
-
 
 
 
