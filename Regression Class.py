@@ -106,6 +106,11 @@ class LinearRegression(object):
         self.predictions = np.dot(self.data, coefficients)
 
     def r_square(self, adjusted=True):
+        '''
+        A function to work out r_squared values
+        :param adjusted: True or False, False returns unadjusted R^2
+        :return: Either an adjusted or non-adjusted R^2
+        '''
         sum_sq = sum((self.targets - self.predictions) ** 2)
         mean_matrix = np.full(self.targets.shape, np.mean(self.targets))
         sum_mean = sum((self.targets - mean_matrix) ** 2)
