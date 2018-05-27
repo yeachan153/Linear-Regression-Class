@@ -1,14 +1,19 @@
 '''
-NOTES
+ISSUES
 1) Consider changing self.data to self.features
 2) Should we normalise categorical values? If not, how do we implement this?
-3) Add error messages for predict function - e.g. if matrix multiplication is not possible.
+3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
+yield less accurate predicitons than just letting it run without normalisation.
+4) PARTIALLY SOLVED: Gradient descent very fussy about eta/iteration parameter constantly having to adjust -
+5) Plotting in gradient descent is a bit limited if the first number is huge, scaling problem
 '''
 
 import pandas as pd
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
+import warnings
+
 
 class LinearRegression(object):
     def __init__(self, data, dependent_var):
@@ -25,24 +30,34 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
-    def gradient_descent(self,iteration = 1e4, cost_function = True, eta = .0001):
+    def gradient_descent(self, iteration=1000, cost_function=True, eta=.000001, plot=True):
         '''
-        CHECK IF THIS WORKS!
         :param iteration: Number of iterations to adjust weight
         :param cost_function: Do you want the MSE values? Useful to plot
         :param eta: Eta value - like a K-Factor in ELO
+        :param plot: Do you want a plot of the cost function?
         '''
         self.sample_size = self.data.shape[0]
         self.weights = np.ones(self.data.shape[1])
+        self.cost_func = []
 
         for i in range(int(iteration)):
             predictions = np.dot(self.data, self.weights)
             raw_error = self.targets - predictions
-            if cost_function == True:
-                self.MSE = []
-                self.MSE.append(((predictions - raw_error)**2) / len(self.targets))
-            self.weights += eta / self.data.shape[0] * np.dot(raw_error, self.data)
+            warnings.simplefilter("error")
+            try:
+                if cost_function == True:
+                    cost = 1 / (2 * len(self.targets)) * sum((predictions - raw_error) ** 2)
+                    self.cost_func.append(cost)
+                self.weights += eta / self.data.shape[0] * np.dot(raw_error, self.data)
+            except RuntimeWarning:
+                print('Runtime warning - try reducing the eta! Your gradient descient is overshooting')
 
+        if plot == True and cost_function == True:
+            figure, axis = plt.subplots(figsize=(15, 10))
+            axis.plot(np.arange(iteration), self.cost_func, 'k')
+            axis.set_ylabel('Mean Square Error/Cost')
+            axis.set_xlabel('Iterations of gradient descent')
 
     def add_token_intercept(self):
         '''
@@ -53,7 +68,7 @@ class LinearRegression(object):
         '''
         self.data.insert(0, 'Intercept Token', 1)
 
-    def mean_normalise(self, method = 'range'):
+    def mean_normalise(self, method='range'):
         '''
         Run this to normalise the data if needed.
         :param method: Either divides with the mean or the standard
