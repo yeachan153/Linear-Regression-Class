@@ -4,7 +4,7 @@ ISSUES
 2) Should we normalise categorical values? If not, how do we implement this?
 3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
 yield less accurate predicitons than just letting it run without normalisation.
-4) PARTIALLY SOLVED: Gradient descent very fussy about eta/iteration parameter constantly having to adjust -
+4) PARTIALLY SOLVED!: Gradient descent very fussy about eta/iteration parameter constantly having to adjust -
 5) Plotting in gradient descent is a bit limited if the first number is huge, scaling problem
 '''
 
