@@ -30,7 +30,7 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
-    def gradient_descent(self, iteration=1000, cost_function=True, eta=.0001, plot=True):
+    def gradient_descent(self, iteration=100000, cost_function=True, eta=.000001, plot=False):
         '''
         CHECK IF THIS WORKS!
         :param iteration: Number of iterations to adjust weight
@@ -99,11 +99,20 @@ class LinearRegression(object):
         IN THE COEFFICIENTS MATRIX!!
         :return: Returns an n-dimensional vector of predicted values
         '''
-        return np.dot(self.data, coefficients)
         self.predictions = np.dot(self.data, coefficients)
 
-    def plot_regression(self):
-        pass
+    def r_square(self, adjusted=True):
+        sum_sq = sum((self.targets - self.predictions) ** 2)
+        mean_matrix = np.full(self.targets.shape, np.mean(self.targets))
+        sum_mean = sum((self.targets - mean_matrix) ** 2)
+        r_squared = 1 - (sum_sq / sum_mean)
+        if adjusted == False:
+            return r_squared
+        elif adjusted == True:
+            top = (1 - r_squared) * (test.data.shape[0] - 1)
+            bottom = test.data.shape[0] - (test.data.shape[1] - 1) - 1
+            adj_r_squared = 1 - (top / bottom)
+            return adj_r_squared
 
 
 
