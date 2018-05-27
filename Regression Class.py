@@ -4,7 +4,7 @@ ISSUES
 2) Should we normalise categorical values? If not, how do we implement this?
 3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
 yield less accurate predicitons than just letting it run without normalisation.
-4) PARTIALLY SOLVED!: Gradient descent very fussy about eta/iteration parameter constantly having to adjust -
+4) PARTIALLY SOLVED: Gradient descent very fussy about eta/iteration parameter constantly having to adjust -
 5) Plotting in gradient descent is a bit limited if the first number is huge, scaling problem
 '''
 
@@ -30,8 +30,9 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
-    def gradient_descent(self, iteration=1000, cost_function=True, eta=.000001, plot=True):
+    def gradient_descent(self, iteration=1000, cost_function=True, eta=.0001, plot=True):
         '''
+        CHECK IF THIS WORKS!
         :param iteration: Number of iterations to adjust weight
         :param cost_function: Do you want the MSE values? Useful to plot
         :param eta: Eta value - like a K-Factor in ELO
@@ -51,7 +52,7 @@ class LinearRegression(object):
                     self.cost_func.append(cost)
                 self.weights += eta / self.data.shape[0] * np.dot(raw_error, self.data)
             except RuntimeWarning:
-                print('Runtime warning - try reducing the eta! Your gradient descient is overshooting')
+                print('Runtime warning - try reducing the eta! Your gradient descent is overshooting')
 
         if plot == True and cost_function == True:
             figure, axis = plt.subplots(figsize=(15, 10))
@@ -99,6 +100,12 @@ class LinearRegression(object):
         :return: Returns an n-dimensional vector of predicted values
         '''
         return np.dot(self.data, coefficients)
+        self.predictions = np.dot(self.data, coefficients)
+
+    def plot_regression(self):
+        pass
+
+
 
 
 
