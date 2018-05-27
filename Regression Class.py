@@ -1,6 +1,6 @@
 '''
 ISSUES
-1) Consider changing self.data to self.features
+1) Why does gradient descent yield such small R^2?
 2) Should we normalise categorical values? If not, how do we implement this?
 3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
 yield less accurate predicitons than just letting it run without normalisation.
@@ -30,9 +30,17 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
+    def normal_fit(self):
+        '''
+        Used instead of gradient_descent to calculate coef weights
+        '''
+        a = np.linalg.inv(np.dot(self.data.transpose(), self.data))
+        b = np.dot(a, self.data.transpose())
+        self.weights = np.dot(b, self.targets)
+
     def gradient_descent(self, iteration=100000, cost_function=True, eta=.000001, plot=False):
         '''
-        CHECK IF THIS WORKS!
+        CHECK IF THIS WORKS! WHY IS R^2 SO LOW?
         :param iteration: Number of iterations to adjust weight
         :param cost_function: Do you want the MSE values? Useful to plot
         :param eta: Eta value - like a K-Factor in ELO
@@ -91,13 +99,9 @@ class LinearRegression(object):
 
     def predict(self, coefficients):
         '''
-        TEST THIS!
         Using self.data, we use matrix multiplication to multiply
         against the coefficients matrix to yield predictions.
-        :param coefficients: Regression coefficients. MAKE SURE
-        THAT EACH COLUMN OF temp_data MATCHES THE COEFFICIENTS
-        IN THE COEFFICIENTS MATRIX!!
-        :return: Returns an n-dimensional vector of predicted values
+        :param coefficients: Regression coefficients.
         '''
         self.predictions = np.dot(self.data, coefficients)
 
