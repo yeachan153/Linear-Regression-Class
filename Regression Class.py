@@ -1,6 +1,6 @@
 '''
 ISSUES
-1) Why does gradient descent yield such small R^2?
+1) Consider changing self.data to self.features
 2) Should we normalise categorical values? If not, how do we implement this?
 3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
 yield less accurate predicitons than just letting it run without normalisation.
@@ -31,16 +31,12 @@ class LinearRegression(object):
         print(self.data.describe())
 
     def normal_fit(self):
-        '''
-        Used instead of gradient_descent to calculate coef weights
-        '''
         a = np.linalg.inv(np.dot(self.data.transpose(), self.data))
         b = np.dot(a, self.data.transpose())
         self.weights = np.dot(b, self.targets)
 
-    def gradient_descent(self, iteration=100000, cost_function=True, eta=.000001, plot=False):
+    def gradient_descent(self, iteration=50, cost_function=True, eta=.000001, plot=False):
         '''
-        CHECK IF THIS WORKS! WHY IS R^2 SO LOW?
         :param iteration: Number of iterations to adjust weight
         :param cost_function: Do you want the MSE values? Useful to plot
         :param eta: Eta value - like a K-Factor in ELO
@@ -107,9 +103,8 @@ class LinearRegression(object):
 
     def r_square(self, adjusted=True):
         '''
-        A function to work out r_squared values
-        :param adjusted: True or False, False returns unadjusted R^2
-        :return: Either an adjusted or non-adjusted R^2
+        Returns R^2 value
+        :param adjusted: True for adjusted
         '''
         sum_sq = sum((self.targets - self.predictions) ** 2)
         mean_matrix = np.full(self.targets.shape, np.mean(self.targets))
@@ -118,8 +113,8 @@ class LinearRegression(object):
         if adjusted == False:
             return r_squared
         elif adjusted == True:
-            top = (1 - r_squared) * (test.data.shape[0] - 1)
-            bottom = test.data.shape[0] - (test.data.shape[1] - 1) - 1
+            top = (1 - r_squared) * (self.data.shape[0] - 1)
+            bottom = self.data.shape[0] - (self.data.shape[1] - 1) - 1
             adj_r_squared = 1 - (top / bottom)
             return adj_r_squared
 
