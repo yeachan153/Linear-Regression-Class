@@ -1,5 +1,6 @@
 '''
 ISSUES
+1) VERIFY WITH SCIKIT REGRESSION
 2) Should we normalise categorical values? If not, how do we implement this?
 3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
 yield less accurate predicitons than just letting it run without normalisation.
