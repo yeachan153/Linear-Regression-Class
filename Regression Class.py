@@ -1,18 +1,18 @@
 '''
 ISSUES
-1) Consider changing self.data to self.features
 2) Should we normalise categorical values? If not, how do we implement this?
 3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
 yield less accurate predicitons than just letting it run without normalisation.
 4) PARTIALLY SOLVED: Gradient descent very fussy about eta/iteration parameter constantly having to adjust -
 5) Plotting in gradient descent is a bit limited if the first number is huge, scaling problem
 '''
-
 import pandas as pd
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
 import warnings
+
+pd.set_option('precision', 10)
 
 
 class LinearRegression(object):
@@ -35,8 +35,9 @@ class LinearRegression(object):
         b = np.dot(a, self.data.transpose())
         self.weights = np.dot(b, self.targets)
 
-    def gradient_descent(self, iteration=50, cost_function=True, eta=.000001, plot=False):
+    def gradient_descent(self, iteration=500000, cost_function=True, eta=.000001, plot=False):
         '''
+        CHECK IF THIS WORKS!
         :param iteration: Number of iterations to adjust weight
         :param cost_function: Do you want the MSE values? Useful to plot
         :param eta: Eta value - like a K-Factor in ELO
@@ -102,22 +103,23 @@ class LinearRegression(object):
         self.predictions = np.dot(self.data, coefficients)
 
     def r_square(self, adjusted=True):
-        '''
-        Returns R^2 value
-        :param adjusted: True for adjusted
-        '''
         sum_sq = sum((self.targets - self.predictions) ** 2)
         mean_matrix = np.full(self.targets.shape, np.mean(self.targets))
         sum_mean = sum((self.targets - mean_matrix) ** 2)
         r_squared = 1 - (sum_sq / sum_mean)
         if adjusted == False:
-            return r_squared
+            if r_squared > 0:
+                return r_squared
+            else:
+                warnings.warn('Something probably went wrong with your gradient descent parameters')
         elif adjusted == True:
             top = (1 - r_squared) * (self.data.shape[0] - 1)
             bottom = self.data.shape[0] - (self.data.shape[1] - 1) - 1
             adj_r_squared = 1 - (top / bottom)
-            return adj_r_squared
-
+            if adj_r_squared > 0:
+                return adj_r_squared
+            else:
+                warnings.warn('Something probably went wrong with your gradient descent parameters')
 
 
 
