@@ -3,7 +3,7 @@ TO DO:
 1) ALL ASSUMPTIONS?!
 2) MSE for normal fit (Yeachan)
 3) regression plot (Natalie)
-4) Make things a bit easier to access
+4) Make things a bit easier to access? E.g. put functions like add_token_intercept inside normal_fit and gradient_descent
 
 IMPROVEMENTS:
 5) Feature selection (significant predictors)
@@ -129,6 +129,24 @@ class LinearRegression(object):
                 return adj_r_squared
             else:
                 warnings.warn('Something probably went wrong with your gradient descent parameters')
+
+    def assumptions(self):
+        '''
+        Checks all your linear regression assumptions!
+        1) Independence of observations - Durbin-Watson
+        '''
+        self.add_token_intercept()
+        self.normal_fit(MSE = False)
+        self.predict(self.weights)
+        squared_errors = (self.targets - self.predictions)**2
+        sum_of_squares = sum(squared_errors)
+        numerator =[]
+        for i in range(len(self.targets) - 1):
+            numerator.append(
+                ((self.targets[i + 1] - self.predictions[i + 1]) - (self.targets[i] - self.predictions[i])) ** 2)
+        numerator = sum(numerator)
+        durbin_watson = numerator / sum_of_squares
+        return durbin_watson
 
 
 
