@@ -1,10 +1,16 @@
 '''
-ISSUES
-2) Should we normalise categorical values? If not, how do we implement this?
-3) Mean Normalisation speeds up gradient descent, but rounding errors in pandas dataframe make it
-yield less accurate predicitons than just letting it run without normalisation.
-4) PARTIALLY SOLVED: Gradient descent very fussy about eta/iteration parameter constantly having to adjust -
-5) Plotting in gradient descent is a bit limited if the first number is huge, scaling problem
+TO DO:
+1) ALL ASSUMPTIONS?!
+2) MSE for normal fit (Yeachan)
+3) regression plot (Natalie)
+4) Make things a bit easier to access
+
+IMPROVEMENTS:
+5) Feature selection (significant predictors)
+6) train/split
+7) cross validation
+8) regularization
+
 '''
 import pandas as pd
 import numpy as np
@@ -30,10 +36,13 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
-    def normal_fit(self):
+    def normal_fit(self, MSE = True):
         a = np.linalg.inv(np.dot(self.data.transpose(), self.data))
         b = np.dot(a, self.data.transpose())
         self.weights = np.dot(b, self.targets)
+        if MSE == True:
+            self.predict(self.weights)
+            return 1/len(self.targets) * sum((self.targets - self.predictions)**2)
 
     def gradient_descent(self, iteration=500000, cost_function=True, eta=.000001, plot=False):
         '''

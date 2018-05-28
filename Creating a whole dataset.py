@@ -37,3 +37,13 @@ columns = [house_price] + rest_of_columns
 data = pd.DataFrame(data, columns = columns)
 '''
 
+'''
+# Batch gradient
+test = LinearRegression(data,target)
+# test.mean_normalise()
+test.add_token_intercept()
+#test.gradient_descent(plot = True)
+test.normal_fit()
+test.predict(test.weights)
+test.r_square(adjusted = False)
+'''
