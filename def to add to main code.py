@@ -36,8 +36,7 @@ def linearity_check():
 
 ''' 
 - multicollinearity assumption
-- Problem = uses "y~x", ols and sm 
-- need to write this from scratch?
+- Problem = using "y~x", ols and sm; do we need to write this from scratch?
 '''
 def VIF(data, target, columns):
     for i in range(0, columns.shape[0]):
@@ -47,5 +46,6 @@ def VIF(data, target, columns):
         vif = round(1/(1-rsq),2)
         print(columns[i], " VIF = " , vif)
 
-VIF(data=data, target=target, columns=columns)
+
+VIF(data,target,columns)
 
