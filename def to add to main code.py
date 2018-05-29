@@ -46,6 +46,12 @@ def VIF(data, target, columns):
         vif = round(1/(1-rsq),2)
         print(columns[i], " VIF = " , vif)
 
+''' 
+PLOTTING
+1) Calculate studentized residual
+2) Calculate unstandardized predicted values 
+3) partial regression plots for each independent variable and dependent variable (excluding categorical data)
+'''
 
-VIF(data,target,columns)
+
 
