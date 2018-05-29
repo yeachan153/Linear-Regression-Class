@@ -61,11 +61,28 @@ PLOTTING
 2) Calculate unstandardized predicted values 
 3) Partial regression plots for each independent variable and dependent variable (excluding categorical data)
 # '''
-def plot():
+
+
+def residual_predicted_plot(self):
     pass
 
-fig, axis = plt.subplots()
-figure, ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8, ax9, ax10, ax11, ax12 = plt.subplots(figsize=(15, 10), nrows=3, ncols=4)
-linear_model = sm.ols(formula='target~CRIM+ZN+INDUS+NOX+RM+AGE+DIS+RAD+TAX+PTRATIO+B+LSTAT', data = data)
-fig = sm.graphics.plot_partregress_grid(linear_model, fig=figure)
+
+def partial_regression_plots(self, coefficients, columns=columns):
+    '''
+    - Partial regression plots for each independent variables vs. target,
+      excluding categorical data (e.g. CHAS).
+    - Values of partial coefficients are found using OLS.
+    - 12 plots (nrow=3, ncol=4) in one figure.
+    :param self:
+    '''
+    residuals = matrix()
+    for i in range(columns):
+        residuals_indv_var = pass # residual of regressing response variable vs. indp var (omitting target)
+        residuals_least_square = pass # residual of regression vs remaining indp var
+        return residuals_indv_var, residuals_least_square
+
+    plt.subplot(341)
+    for i in range(columns):
+        plt.scatter(residuals_indv_var[i], residuals_least_square[i])
+    plt.show()
 
