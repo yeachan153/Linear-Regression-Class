@@ -12,8 +12,16 @@ features = boston.data
 target = boston.target
 columns = boston.feature_names
 data = pd.DataFrame(features, columns = columns)
+
 print(data)
 print(columns)
+
+for each in columns:
+        plt.scatter(data[each], target, color='blue', s=3, marker='x')
+        plt.ylabel("Price")
+        plt.xlabel(each)
+        plt.show()
+
 
 ''' Outliers check '''
 def z_scores(data):
@@ -34,6 +42,7 @@ def linearity_check():
         plt.xlabel(each)
         plt.show()
 
+
 ''' 
 - multicollinearity assumption
 - Problem = using "y~x", ols and sm; do we need to write this from scratch?
@@ -50,8 +59,13 @@ def VIF(data, target, columns):
 PLOTTING
 1) Calculate studentized residual
 2) Calculate unstandardized predicted values 
-3) partial regression plots for each independent variable and dependent variable (excluding categorical data)
-'''
+3) Partial regression plots for each independent variable and dependent variable (excluding categorical data)
+# '''
+def plot():
+    pass
 
-
+fig, axis = plt.subplots()
+figure, ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8, ax9, ax10, ax11, ax12 = plt.subplots(figsize=(15, 10), nrows=3, ncols=4)
+linear_model = sm.ols(formula='target~CRIM+ZN+INDUS+NOX+RM+AGE+DIS+RAD+TAX+PTRATIO+B+LSTAT', data = data)
+fig = sm.graphics.plot_partregress_grid(linear_model, fig=figure)
 
