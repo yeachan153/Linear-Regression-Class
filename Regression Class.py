@@ -3,7 +3,7 @@ TO DO:
 1) ALL ASSUMPTIONS?!
 2) MSE for normal fit (Yeachan)
 3) regression plot (Natalie)
-4) Make things a bit easier to access? E.g. put functions like add_token_intercept inside normal_fit and gradient_descent
+4) Make things a bit easier to access? E.g. put functions like add_token_intercept inside normal_fit and gradient_descent (Yeachan)
 
 IMPROVEMENTS:
 5) Feature selection (significant predictors)
@@ -17,6 +17,9 @@ import numpy as np
 import copy
 import matplotlib.pyplot as plt
 import warnings
+import seaborn as sns
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.tools.tools import add_constant
 
 pd.set_option('precision', 10)
 
@@ -42,7 +45,7 @@ class LinearRegression(object):
         self.weights = np.dot(b, self.targets)
         if MSE == True:
             self.predict(self.weights)
-            return 1/len(self.targets) * sum((self.targets - self.predictions)**2)
+            self.MSE =  1/len(self.targets) * sum((self.targets - self.predictions)**2)
 
     def gradient_descent(self, iteration=500000, cost_function=True, eta=.000001, plot=False):
         '''
@@ -66,7 +69,8 @@ class LinearRegression(object):
                     self.cost_func.append(cost)
                 self.weights += eta / self.data.shape[0] * np.dot(raw_error, self.data)
             except RuntimeWarning:
-                print('Runtime warning - try reducing the eta! Your gradient descent is overshooting')
+                print('Your gradient descent is overshooting! Lower the eta and run again.')
+
 
         if plot == True and cost_function == True:
             figure, axis = plt.subplots(figsize=(15, 10))
@@ -120,7 +124,7 @@ class LinearRegression(object):
             if r_squared > 0:
                 return r_squared
             else:
-                warnings.warn('Something probably went wrong with your gradient descent parameters')
+                warnings.warn('If you used gradient descent, try fitting with inverse transpose')
         elif adjusted == True:
             top = (1 - r_squared) * (self.data.shape[0] - 1)
             bottom = self.data.shape[0] - (self.data.shape[1] - 1) - 1
@@ -128,26 +132,59 @@ class LinearRegression(object):
             if adj_r_squared > 0:
                 return adj_r_squared
             else:
-                warnings.warn('Something probably went wrong with your gradient descent parameters')
+                warnings.warn('If you used gradient descent, try fitting with inverse transpose')
 
-    def assumptions(self):
-        '''
-        Checks all your linear regression assumptions!
-        1) Independence of observations - Durbin-Watson
-        '''
-        self.add_token_intercept()
-        self.normal_fit(MSE = False)
-        self.predict(self.weights)
-        squared_errors = (self.targets - self.predictions)**2
+    def durbin_watson(self):
+        squared_errors = (self.targets - self.predictions) ** 2
         sum_of_squares = sum(squared_errors)
-        numerator =[]
+        numerator = []
         for i in range(len(self.targets) - 1):
             numerator.append(
                 ((self.targets[i + 1] - self.predictions[i + 1]) - (self.targets[i] - self.predictions[i])) ** 2)
         numerator = sum(numerator)
         durbin_watson = numerator / sum_of_squares
-        return durbin_watson
+        if durbin_watson < 2.5 and durbin_watson > 1.5:
+            print(
+                'No evidence of first order auto-correlations between residuals - check the critical tables to be sure. Durbin Watson: ' + str(
+                    durbin_watson))
+        elif durbin_watson > 2.5:
+            print('Evidence of negative first order autocorrelations between residuals. Durbin Watson: ' + str(
+                durbin_watson))
+        elif durbin_watson < 1.5:
+            print('Evidence of positive first order autocorrelations between residuals. Durbin Watson:  ' + str(
+                durbin_watson))
 
+    def residual_homoscedastity(self):
+        sns.set()
+        sns.regplot(self.predictions, (self.targets-self.predictions), lowess=True, scatter_kws={'s': 2}, color='.10')
+        plt.title('Residuals vs Predicted')
+        plt.xlabel('Predicted Values')
+        plt.ylabel('Residuals')
+
+    def multicollinearity(self):
+        VIF = pd.Series([variance_inflation_factor(self.data.values, i) for i in range(self.data.shape[1])],
+                        index=list(self.data))
+        for idx, value in enumerate(VIF[1:]):
+            if value > 5:
+                print(
+                    'The feature ' + VIF.index[idx] + ' shows evidence of multicollinearity.' + ' VIF = ' + str(value))
+
+    def fit(self, assumptions = True, method = 'inverse_transpose'):
+        self.add_token_intercept()
+        if method == 'inverse_transpose':
+            MSE = bool(input('Do you want a MSE value? - Enter True or False. Access it using class.MSE'))
+            self.normal_fit(MSE = MSE)
+        elif method == 'gradient descent':
+            num_iter = int(input('Enter a whole number to iterate on'))
+            eta = float(input('What is your learning rate? Enter a decimal number under 0.5'))
+            plot = bool(input('Enter True or False - plot of cost function'))
+            self.gradient_descent(num_iter,eta=eta, plot = plot)
+        self.predict(self.weights)
+        if assumptions == True:
+            self.durbin_watson()
+            self.residual_homoscedastity()
+            print('Check residual plot!')
+            self.multicollinearity()
 
 
 
