@@ -34,6 +34,8 @@ def z_scores(data):
     print(z_scores_df)
     # return np.where(np.abs(z_scores) > threshold)
 
+
+
 ''' Linearity assumption '''
 def linearity_check():
     for each in columns:
