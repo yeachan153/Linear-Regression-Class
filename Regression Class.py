@@ -1,11 +1,9 @@
 '''
 TO DO:
-1) ALL ASSUMPTIONS?!
-2) MSE for normal fit (Yeachan)
 3) regression plot (Natalie)
-4) Make things a bit easier to access? E.g. put functions like add_token_intercept inside normal_fit and gradient_descent (Yeachan)
 
 IMPROVEMENTS:
+4) Leverage/Influence (cook's distance)
 5) Feature selection (significant predictors)
 6) train/split
 7) cross validation
@@ -19,7 +17,7 @@ import matplotlib.pyplot as plt
 import warnings
 import seaborn as sns
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-from statsmodels.tools.tools import add_constant
+from scipy.stats import kstest
 
 pd.set_option('precision', 10)
 
@@ -114,6 +112,7 @@ class LinearRegression(object):
         :param coefficients: Regression coefficients.
         '''
         self.predictions = np.dot(self.data, coefficients)
+        self.residuals =  self.targets  - self.predictions
 
     def r_square(self, adjusted=True):
         sum_sq = sum((self.targets - self.predictions) ** 2)
@@ -155,11 +154,14 @@ class LinearRegression(object):
                 durbin_watson))
 
     def residual_homoscedastity(self):
+        self.std_res = self.residuals / np.std(self.residuals)
+        print('Check residual plot!')
+        plt.figure()
         sns.set()
-        sns.regplot(self.predictions, (self.targets-self.predictions), lowess=True, scatter_kws={'s': 2}, color='.10')
-        plt.title('Residuals vs Predicted')
+        sns.regplot(self.predictions, self.std_res, lowess=True, scatter_kws={'s': 2}, color='.10')
+        plt.title('Std. Residuals vs Predicted')
         plt.xlabel('Predicted Values')
-        plt.ylabel('Residuals')
+        plt.ylabel('Standardized Residuals')
 
     def multicollinearity(self):
         VIF = pd.Series([variance_inflation_factor(self.data.values, i) for i in range(self.data.shape[1])],
@@ -168,6 +170,46 @@ class LinearRegression(object):
             if value > 5:
                 print(
                     'The feature ' + VIF.index[idx] + ' shows evidence of multicollinearity.' + ' VIF = ' + str(value))
+
+    def outlier_func(self):
+        self.outliers = []
+        for i in range(self.data.shape[0]):
+            if np.abs(self.std_res[i]) > 3:
+                self.outliers.append(i)
+        if len(self.outliers) == 0:
+            print('No prediction outliers present')
+        else:
+            print(str(len(self.outliers)) + ' outliers. Check class.outliers for row indexes')
+
+    def leverage(self):
+        pass
+
+    def influence(self):
+        pass
+
+    def filter_rows(self, row_indexes):
+        pass
+
+    def train_split(self):
+        pass
+
+    def feature_select(self):
+        pass
+
+    def cross_validate(self):
+        pass
+
+    def residual_normality(self):
+        p_val = kstest(self.std_res, cdf = 'norm')[1]
+        if p_val > 0.05:
+            print('Residuals normally distributed according to Kolmogorov-Smirnov')
+        elif p_val < 0.05:
+            print('Residuals not normally distributed according toKolmogorov-Smirnov - check residual histogram')
+        plt.figure()
+        sns.distplot(self.std_res)
+        plt.title('House Price Residuals')
+        plt.xlabel('Standardized Residuals')
+        plt.ylabel('Count')
 
     def fit(self, assumptions = True, method = 'inverse_transpose'):
         self.add_token_intercept()
@@ -183,9 +225,9 @@ class LinearRegression(object):
         if assumptions == True:
             self.durbin_watson()
             self.residual_homoscedastity()
-            print('Check residual plot!')
             self.multicollinearity()
-
+            self.outlier_func()
+            self.residual_normality()
 
 
 
