@@ -114,6 +114,12 @@ class LinearRegression(object):
         self.predictions = np.dot(self.data, coefficients)
         self.residuals =  self.targets  - self.predictions
 
+    def predict_new(self, data, coef, targets):
+        data.insert(0, 'Intercept Token', 1)
+        self.new_predictions = np.dot(data, coef)
+        self.new_resid = targets - self.new_predictions
+        self.new_std_res = self.new_resid / np.std(self.new_resid)
+
     def r_square(self, adjusted=True):
         sum_sq = sum((self.targets - self.predictions) ** 2)
         mean_matrix = np.full(self.targets.shape, np.mean(self.targets))
