@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6500 64-bit) (preloaded format=pdflatex 2017.12.12)  24 MAY 2018 11:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6500 64-bit) (preloaded format=pdflatex 2017.12.12)  30 MAY 2018 17:14
 entering extended mode
 **./eacl2017.tex
 (eacl2017.tex
@@ -52,8 +52,7 @@ Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
 \symlasy=\mathgroup4
 LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
 (Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
-)
-No file eacl2017.aux.
+) (eacl2017.aux)
 \openout1 = `eacl2017.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 51.
@@ -105,12 +104,6 @@ Underfull \hbox (badness 1902) in paragraph at lines 91--92
 \OT1/ptm/m/n/10.95 able at $\OT1/pcr/m/n/10.95 http : / / eacl2017 . org/$\OT1/
 ptm/m/n/10.95 . Please
  []
-
-
-LaTeX Warning: Reference `ssec:first' on page 1 undefined on input line 100.
-
-
-LaTeX Warning: Reference `sec:length' on page 1 undefined on input line 104.
 
 
 Underfull \hbox (badness 1142) in paragraph at lines 107--109
@@ -169,10 +162,6 @@ File: omsptm.fd
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 198.
-
-
-LaTeX Warning: Reference `font-table' on page 3 undefined on input line 258.
-
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <9> on input line 298.
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -255,18 +244,11 @@ Underfull \hbox (badness 1466) in paragraph at lines 432--441
  []
 
 No file eacl2017.bbl.
-[5] (eacl2017.aux)
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- )
+[5] (eacl2017.aux) )
 (\end occurred when \iffalse on line 331 was incomplete) 
 Here is how much of TeX's memory you used:
- 577 strings out of 493312
- 7878 string characters out of 3127651
+ 579 strings out of 493312
+ 7973 string characters out of 3127651
  69699 words of memory out of 3000000
  4150 multiletter control sequences out of 15000+200000
  30906 words of font info for 67 fonts, out of 3000000 for 9000
@@ -282,7 +264,7 @@ iKTeX 2.9/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/yeachan153/AppData/Local
 /Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Users/yeachan153/AppD
 ata/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Users/yeacha
 n153/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on eacl2017.pdf (5 pages, 111891 bytes).
+Output written on eacl2017.pdf (5 pages, 111843 bytes).
 PDF statistics:
  47 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

@@ -1,0 +1,20 @@
+Code skeleton:
+
+1) Check initial assumptions:
+	- Multicollinearity
+	- Linearity plots
+2) Train:
+	- Cross Validate (DONE!)
+	- Regularise
+	- Feature Selection algorithm - Univariate selection chi sq?
+3) Predict - DONE
+	- R^2 (DONE!)
+	- Significant Predictors 
+4) Check post-test assumptions:
+	- Durbin Watson 
+	- Residual Homoscedastity
+	- Outlier_func
+	- residual_normality
+	- Leverage points (Leverage x, std.resid y = cook's distance plot)
+	- Influential points
+
