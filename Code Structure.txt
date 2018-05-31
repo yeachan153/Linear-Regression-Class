@@ -7,7 +7,7 @@ Code skeleton:
 3) Train:
 	- Cross Validate (DONE!)
 
-	- Regularise
+	- Regularise (DONE!)
 4) Predict on TEST DATA - DONE
 	- R^2 (DONE!)5
 5) Check post-test assumptions:

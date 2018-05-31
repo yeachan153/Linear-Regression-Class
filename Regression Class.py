@@ -49,16 +49,24 @@ class LinearRegression(object):
         self.data, self.targets, self.test_data, self.test_targets = self.train_split(split)
         print('Your training data can be accessed in class.data and class.targets. Your test data is class.test_data and class.test_targets')
 
-    def normal_fit(self, data, target):
+    def normal_fit(self, data, target, regrate, regularise = False):
         '''
         :param data: Data to be fitted
         :param target: Target Data
         :return: Returns regression coefficients
         '''
-        a = np.linalg.inv(np.dot(data.transpose(), data) + )
-        b = np.dot(a, data.transpose())
-        weights = np.dot(b, target)
-        return weights
+        if regularise == False:
+            a = np.linalg.inv(np.dot(data.transpose(), data))
+            b = np.dot(a, data.transpose())
+            weights = np.dot(b, target)
+            return weights
+        elif regularise == True:
+            identity = np.identity(data.shape[1])
+            identity[0][0] = 0
+            a = np.linalg.inv(np.dot(data.transpose(), data) + regrate * identity)
+            b = np.dot(a, data.transpose())
+            weights = np.dot(b, target)
+            return weights
 
     def MSE(self, test_data, test_targets, weights):
         '''
@@ -102,7 +110,7 @@ class LinearRegression(object):
     #         axis.set_ylabel('Mean Square Error/Cost')
     #         axis.set_xlabel('Iterations of gradient descent')
 
-    def mean_normalise(self):
+    def mean_normalise(self, data):
         '''
         Run this to normalise the data if needed.
         :param method: Either divides with the mean or the standard
@@ -110,13 +118,14 @@ class LinearRegression(object):
         :return: Returns self.data as a normalised dataset - useful
         if using gradient descent to minimise cost function
         '''
-        for i in range(len(self.data.columns)):
+        for i in range(len(data.columns)):
             new_col = []
-            for each in self.data.iloc[:, i]:
-                val_mean = each - np.mean(self.data.iloc[:, i])
-                range1 = max(self.data.iloc[:, i]) - min(self.data.iloc[:, i])
+            for each in data.iloc[:, i]:
+                val_mean = each - np.mean(data.iloc[:, i])
+                range1 = max(data.iloc[:, i]) - min(data.iloc[:, i])
                 new_col.append(val_mean / range1)
-            self.data.iloc[:, i] = new_col
+            data.iloc[:, i] = new_col
+        return data
 
     def predict_new(self, data, targets):
         data = copy.deepcopy(data)
@@ -224,22 +233,27 @@ class LinearRegression(object):
         test_targets = target[~random]
         return train_data, train_targets, test_data, test_targets
 
-    def train(self, MCC=True, normalise = False):
+    def train(self, MCC=True, normalise = False, regularise = False):
         '''
         :param MCC: True for Monte Carlo Cross Validation
         :normalise: True/False to normalise data
         :return: Regression coefficients, Mean Squared Error
         '''
         if normalise == True:
-            self.mean_normalise()
+            self.data = self.mean_normalise(self.data)
+            self.test_data = self.mean_normalise(self.test_data)
         else:
             pass
         target = copy.deepcopy(self.targets)
         temp_data = copy.deepcopy(self.data)
         temp_data2 = copy.deepcopy(temp_data)
         temp_data2.insert(0, 'Intercept Token', 1)
-        coef = self.normal_fit(temp_data2, target)
+        coef = self.normal_fit(temp_data2, target, regrate = 0)
         Msq = self.MSE(temp_data2, target, coef)
+        if regularise == True and MCC == False:
+            regrate = float(input('Input regularisation rate'))
+            coef = self.normal_fit(temp_data2, target,regrate, regularise = True)
+            Msq = self.MSE(temp_data2, target, coef)
         if MCC == False:
             self.coef = coef
             self.mean_sq_error = Msq
@@ -249,15 +263,27 @@ class LinearRegression(object):
             fold_split = float(input('Enter an the split ratio per fold (0 - 1)'))
             summed_coef = 0
             summed_MSE = 0
-            for every_fold in range(n_folds):
-                train_data, train_targets, test_data, test_targets = self.train_split(split=fold_split)
-                train_data.insert(0, 'Intercept Token', 1)
-                test_data.insert(0, 'Intercept Token', 1)
-                summed_coef += self.normal_fit(train_data, train_targets)
-                current_coef = self.normal_fit(train_data, train_targets)
-                summed_MSE += self.MSE(test_data, test_targets, current_coef)
-            avg_coef = summed_coef / n_folds
-            avg_MSE = summed_MSE / n_folds
+            if regularise == True:
+                regrate = float(input('Input regularisation rate'))
+                for every_fold in range(n_folds):
+                    train_data, train_targets, test_data, test_targets = self.train_split(split=fold_split)
+                    train_data.insert(0, 'Intercept Token', 1)
+                    test_data.insert(0, 'Intercept Token', 1)
+                    summed_coef += self.normal_fit(train_data, train_targets,regrate, regularise = True)
+                    current_coef = self.normal_fit(train_data, train_targets,regrate, regularise = True)
+                    summed_MSE += self.MSE(test_data, test_targets, current_coef)
+                avg_coef = summed_coef / n_folds
+                avg_MSE = summed_MSE / n_folds
+            elif regularise == False:
+                for every_fold in range(n_folds):
+                    train_data, train_targets, test_data, test_targets = self.train_split(split=fold_split)
+                    train_data.insert(0, 'Intercept Token', 1)
+                    test_data.insert(0, 'Intercept Token', 1)
+                    summed_coef += self.normal_fit(train_data, train_targets,regrate = 0)
+                    current_coef = self.normal_fit(train_data, train_targets, regrate = 0)
+                    summed_MSE += self.MSE(test_data, test_targets, current_coef)
+                avg_coef = summed_coef / n_folds
+                avg_MSE = summed_MSE / n_folds
             if Msq == avg_MSE:
                 print('Your mean squared error has remained the same after cross validation. Check class.coef & class.mean_sq_error.')
             elif Msq > avg_MSE:
