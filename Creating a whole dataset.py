@@ -24,26 +24,11 @@ import pandas as pd
 Putting the data into pandas and creating 1 dataset
 '''
 data = pd.DataFrame(features, columns = columns)
+target
 
-'''
-# Only use below if you want all datasets together
-target = pd.DataFrame(target)
-data['House Prices'] = target
+def train_split(data, split = .6):
+    train_data = data.iloc[:round(data.shape[0] * split),:]
+    test_data = data.iloc[round(data.shape[0] * split):,:]
+    return train_data, test_data
 
-house_price = list(data)[-1]
-rest_of_columns = list(data)[:-1]
-columns = [house_price] + rest_of_columns
 
-data = pd.DataFrame(data, columns = columns)
-'''
-
-'''
-# Batch gradient
-test = LinearRegression(data,target)
-# test.mean_normalise()
-test.add_token_intercept()
-#test.gradient_descent(plot = True)
-test.normal_fit()
-test.predict(test.weights)
-test.r_square(adjusted = False)
-'''

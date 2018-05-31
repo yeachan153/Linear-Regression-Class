@@ -1,14 +1,20 @@
 '''
+NOTE!
+1) UPDATE scikit-learn
+'''
+
+'''
 TO DO:
 3) regression plot (Natalie)
 
 IMPROVEMENTS:
-4) Leverage/Influence (cook's distance)
-5) Feature selection (significant predictors)
-6) train/split
-7) cross validation
-8) regularization
+3) MAKE EVERYTHING WORK AGAIN! - sort out unhidden functions
+4) Regularization (using normal)
+5) Leverage/Influential points
+6) Maybe feature selection?
 
+self.coef
+self.mean_sq_error
 '''
 import pandas as pd
 import numpy as np
@@ -18,10 +24,9 @@ import warnings
 import seaborn as sns
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from scipy.stats import kstest
+from sklearn.model_selection import KFold
 
 pd.set_option('precision', 10)
-
-
 class LinearRegression(object):
     def __init__(self, data, dependent_var):
         self.data = copy.deepcopy(data)
@@ -37,55 +42,65 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
-    def normal_fit(self, MSE = True):
-        a = np.linalg.inv(np.dot(self.data.transpose(), self.data))
-        b = np.dot(a, self.data.transpose())
-        self.weights = np.dot(b, self.targets)
-        if MSE == True:
-            self.predict(self.weights)
-            self.MSE =  1/len(self.targets) * sum((self.targets - self.predictions)**2)
+    def original_split(self, split):
+        self.data, self.targets, self.test_data, self.test_targets = self.train_split(split)
+        print('Your training data can be accessed in class.data and class.targets. Your test data is class.test_data and class.test_targets')
 
-    def gradient_descent(self, iteration=500000, cost_function=True, eta=.000001, plot=False):
+    def normal_fit(self, data, target):
         '''
-        CHECK IF THIS WORKS!
-        :param iteration: Number of iterations to adjust weight
-        :param cost_function: Do you want the MSE values? Useful to plot
-        :param eta: Eta value - like a K-Factor in ELO
-        :param plot: Do you want a plot of the cost function?
+        :param data: Data to be fitted
+        :param target: Target Data
+        :return: Returns regression coefficients
         '''
-        self.sample_size = self.data.shape[0]
-        self.weights = np.ones(self.data.shape[1])
-        self.cost_func = []
+        a = np.linalg.inv(np.dot(data.transpose(), data))
+        b = np.dot(a, data.transpose())
+        weights = np.dot(b, target)
+        return weights
 
-        for i in range(int(iteration)):
-            predictions = np.dot(self.data, self.weights)
-            raw_error = self.targets - predictions
-            warnings.simplefilter("error")
-            try:
-                if cost_function == True:
-                    cost = 1 / (2 * len(self.targets)) * sum((predictions - raw_error) ** 2)
-                    self.cost_func.append(cost)
-                self.weights += eta / self.data.shape[0] * np.dot(raw_error, self.data)
-            except RuntimeWarning:
-                print('Your gradient descent is overshooting! Lower the eta and run again.')
-
-
-        if plot == True and cost_function == True:
-            figure, axis = plt.subplots(figsize=(15, 10))
-            axis.plot(np.arange(iteration), self.cost_func, 'k')
-            axis.set_ylabel('Mean Square Error/Cost')
-            axis.set_xlabel('Iterations of gradient descent')
-
-    def add_token_intercept(self):
+    def MSE(self, test_data, test_targets, weights):
         '''
-        Adds 1's in column 0 of the data, in order for matrix multiplication
-        with intercept values to make sense. Only run after running mean_normalise
-        if mean_normalise is being run
-        :return: self.data now has a new column
+        :param test_data: Enter test data
+        :param test_targets: Enter test target
+        :param weights: Enter regression coefficients that you extracted from training
+        :return: Retunrs MSE
         '''
-        self.data.insert(0, 'Intercept Token', 1)
+        prediction = np.dot(test_data, weights)
+        MSE = 1 / len(test_targets) * sum((test_targets - prediction) ** 2)
+        return MSE
 
-    def mean_normalise(self, method='range'):
+    # def gradient_descent(self, iteration=500000, cost_function=True, eta=.000001, plot=False):
+    #     '''
+    #     CHECK IF THIS WORKS!
+    #     :param iteration: Number of iterations to adjust weight
+    #     :param cost_function: Do you want the MSE values? Useful to plot
+    #     :param eta: Eta value - like a K-Factor in ELO
+    #     :param plot: Do you want a plot of the cost function?
+    #     '''
+    #     self.sample_size = self.data.shape[0]
+    #     self.weights = np.ones(self.data.shape[1])
+    #     self.cost_func = []
+    #
+    #     for i in range(int(iteration)):
+    #         predictions = np.dot(self.data, self.weights)
+    #         raw_error = self.targets - predictions
+    #         warnings.simplefilter("error")
+    #         try:
+    #             if cost_function == True:
+    #                 cost = 1 / (2 * len(self.targets)) * sum((predictions - raw_error) ** 2)
+    #                 self.cost_func.append(cost)
+    #             self.weights += eta / self.data.shape[0] * np.dot(raw_error, self.data)
+    #         except RuntimeWarning:
+    #             print('Your gradient descent is overshooting! Lower the eta and run again.')
+    #
+    #
+    #     if plot == True and cost_function == True:
+    #         figure, axis = plt.subplots(figsize=(15, 10))
+    #         axis.plot(np.arange(iteration), self.cost_func, 'k')
+    #         axis.set_ylabel('Mean Square Error/Cost')
+    #         axis.set_xlabel('Iterations of gradient descent')
+
+
+    def mean_normalise(self):
         '''
         Run this to normalise the data if needed.
         :param method: Either divides with the mean or the standard
@@ -97,47 +112,39 @@ class LinearRegression(object):
             new_col = []
             for each in self.data.iloc[:, i]:
                 val_mean = each - np.mean(self.data.iloc[:, i])
-                if method == 'range':
-                    range1 = max(self.data.iloc[:, i]) - min(self.data.iloc[:, i])
-                    new_col.append(val_mean / range1)
-                elif method == 'std':
-                    std = self.data.iloc[:, i].std()
-                    new_col.append(val_mean / std)
+                range1 = max(self.data.iloc[:, i]) - min(self.data.iloc[:, i])
+                new_col.append(val_mean / range1)
             self.data.iloc[:, i] = new_col
 
-    def predict(self, coefficients):
-        '''
-        Using self.data, we use matrix multiplication to multiply
-        against the coefficients matrix to yield predictions.
-        :param coefficients: Regression coefficients.
-        '''
-        self.predictions = np.dot(self.data, coefficients)
-        self.residuals =  self.targets  - self.predictions
-
-    def predict_new(self, data, coef, targets):
+    def predict_new(self, data, targets):
+        data = copy.deepcopy(data)
+        self.data2 = data
+        self.targets2 = copy.deepcopy(targets)
         data.insert(0, 'Intercept Token', 1)
-        self.new_predictions = np.dot(data, coef)
-        self.new_resid = targets - self.new_predictions
-        self.new_std_res = self.new_resid / np.std(self.new_resid)
+        self.predictions = np.dot(data, self.coef)
+        self.resid = self.targets2 - self.predictions
+        self.std_res = self.resid / np.std(self.resid)
+        self.r_square()
+        print('Check class.predictions, class.resid & class.std_res')
 
-    def r_square(self, adjusted=True):
-        sum_sq = sum((self.targets - self.predictions) ** 2)
-        mean_matrix = np.full(self.targets.shape, np.mean(self.targets))
-        sum_mean = sum((self.targets - mean_matrix) ** 2)
+    def r_square(self):
+        sum_sq = sum((self.targets2 - self.predictions) ** 2)
+        mean_matrix = np.full(self.targets2.shape, np.mean(self.targets2))
+        sum_mean = sum((self.targets2 - mean_matrix) ** 2)
         r_squared = 1 - (sum_sq / sum_mean)
-        if adjusted == False:
-            if r_squared > 0:
-                return r_squared
-            else:
-                warnings.warn('If you used gradient descent, try fitting with inverse transpose')
-        elif adjusted == True:
-            top = (1 - r_squared) * (self.data.shape[0] - 1)
-            bottom = self.data.shape[0] - (self.data.shape[1] - 1) - 1
-            adj_r_squared = 1 - (top / bottom)
-            if adj_r_squared > 0:
-                return adj_r_squared
-            else:
-                warnings.warn('If you used gradient descent, try fitting with inverse transpose')
+        if r_squared > 0:
+            self.r = r_squared
+            print('Check class.r for R^2')
+        else:
+            warnings.warn('If you used gradient descent, try fitting with inverse transpose')
+        top = (1 - r_squared) * (self.data2.shape[0] - 1)
+        bottom = self.data2.shape[0] - (self.data2.shape[1] - 1) - 1
+        adj_r_squared = 1 - (top / bottom)
+        if adj_r_squared > 0:
+            self.adj_r = adj_r_squared
+            print('Check class.adj_r for adjusted R^2')
+        else:
+            warnings.warn('If you used gradient descent, try fitting with inverse transpose')
 
     def durbin_watson(self):
         squared_errors = (self.targets - self.predictions) ** 2
@@ -187,24 +194,6 @@ class LinearRegression(object):
         else:
             print(str(len(self.outliers)) + ' outliers. Check class.outliers for row indexes')
 
-    def leverage(self):
-        pass
-
-    def influence(self):
-        pass
-
-    def filter_rows(self, row_indexes):
-        pass
-
-    def train_split(self):
-        pass
-
-    def feature_select(self):
-        pass
-
-    def cross_validate(self):
-        pass
-
     def residual_normality(self):
         p_val = kstest(self.std_res, cdf = 'norm')[1]
         if p_val > 0.05:
@@ -212,28 +201,82 @@ class LinearRegression(object):
         elif p_val < 0.05:
             print('Residuals not normally distributed according toKolmogorov-Smirnov - check residual histogram')
         plt.figure()
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         sns.distplot(self.std_res)
         plt.title('House Price Residuals')
         plt.xlabel('Standardized Residuals')
         plt.ylabel('Count')
 
-    def fit(self, assumptions = True, method = 'inverse_transpose'):
-        self.add_token_intercept()
-        if method == 'inverse_transpose':
-            MSE = bool(input('Do you want a MSE value? - Enter True or False. Access it using class.MSE'))
-            self.normal_fit(MSE = MSE)
-        elif method == 'gradient descent':
-            num_iter = int(input('Enter a whole number to iterate on'))
-            eta = float(input('What is your learning rate? Enter a decimal number under 0.5'))
-            plot = bool(input('Enter True or False - plot of cost function'))
-            self.gradient_descent(num_iter,eta=eta, plot = plot)
-        self.predict(self.weights)
-        if assumptions == True:
-            self.durbin_watson()
-            self.residual_homoscedastity()
-            self.multicollinearity()
-            self.outlier_func()
-            self.residual_normality()
+    def train_split(self, split=.6):
+        '''
+        :param split: Enter the split/train split ratio
+        :return: Returns train_data, train_targets, test_data, test_targets
+        '''
+        data = copy.deepcopy(self.data)
+        target = copy.deepcopy(self.targets)
+        random = np.random.rand(len(data)) < split
+        train_data = data[random]
+        test_data = data[~random]
+        train_targets = target[random]
+        test_targets = target[~random]
+        return train_data, train_targets, test_data, test_targets
+
+    def train(self, MCC=True, normalise = False):
+        '''
+        :param MCC: True for Monte Carlo Cross Validation
+        :normalise: True/False to normalise data
+        :return: Regression coefficients, Mean Squared Error
+        '''
+        if normalise == True:
+            self.mean_normalise()
+        else:
+            pass
+        target = copy.deepcopy(self.targets)
+        temp_data = copy.deepcopy(self.data)
+        temp_data2 = copy.deepcopy(temp_data)
+        temp_data2.insert(0, 'Intercept Token', 1)
+        coef = self.normal_fit(temp_data2, target)
+        Msq = self.MSE(temp_data2, target, coef)
+        if MCC == False:
+            self.coef = coef
+            self.mean_sq_error = Msq
+            print('Check class.coef & class.mean_sq_error.')
+        elif MCC == True:
+            n_folds = int(input('Enter an integer value of folds'))
+            fold_split = float(input('Enter an the split ratio per fold (0 - 1)'))
+            summed_coef = 0
+            summed_MSE = 0
+            for every_fold in range(n_folds):
+                train_data, train_targets, test_data, test_targets = self.train_split(split=fold_split)
+                train_data.insert(0, 'Intercept Token', 1)
+                test_data.insert(0, 'Intercept Token', 1)
+                summed_coef += self.normal_fit(train_data, train_targets)
+                current_coef = self.normal_fit(train_data, train_targets)
+                summed_MSE += self.MSE(test_data, test_targets, current_coef)
+            avg_coef = summed_coef / n_folds
+            avg_MSE = summed_MSE / n_folds
+            if Msq == avg_MSE:
+                print('Your mean squared error has remained the same after cross validation. Check class.coef & class.mean_sq_error.')
+            elif Msq > avg_MSE:
+                print('Your mean squared error has reduced post MCC from ' + str(Msq) + ' to ' + str(avg_MSE) +
+                      '. Check class.coef & class.mean_sq_error.')
+            elif Msq < avg_MSE:
+                print('Your mean squared error has increased post MCC from ' + str(Msq) + ' to ' + str(avg_MSE) +
+                      '. Check class.coef & class.mean_sq_error.')
+            self.coef = avg_coef
+            self.mean_sq_error = avg_MSE
+
+
+
+
+'''
+self.durbin_watson()
+self.residual_homoscedastity()
+self.multicollinearity()
+self.outlier_func()
+self.residual_normality()
+'''
+
 
 
 
