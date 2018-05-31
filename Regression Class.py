@@ -42,6 +42,9 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
+    def missing_value(self):
+        print(self.data.isnull().sum())
+
     def original_split(self, split):
         self.data, self.targets, self.test_data, self.test_targets = self.train_split(split)
         print('Your training data can be accessed in class.data and class.targets. Your test data is class.test_data and class.test_targets')
@@ -52,7 +55,7 @@ class LinearRegression(object):
         :param target: Target Data
         :return: Returns regression coefficients
         '''
-        a = np.linalg.inv(np.dot(data.transpose(), data))
+        a = np.linalg.inv(np.dot(data.transpose(), data) + )
         b = np.dot(a, data.transpose())
         weights = np.dot(b, target)
         return weights
@@ -68,7 +71,7 @@ class LinearRegression(object):
         MSE = 1 / len(test_targets) * sum((test_targets - prediction) ** 2)
         return MSE
 
-    # def gradient_descent(self, iteration=500000, cost_function=True, eta=.000001, plot=False):
+    # def gradient_descent(self, iteration=50000, cost_function=True, eta=.000001, plot=False):
     #     '''
     #     CHECK IF THIS WORKS!
     #     :param iteration: Number of iterations to adjust weight
@@ -98,7 +101,6 @@ class LinearRegression(object):
     #         axis.plot(np.arange(iteration), self.cost_func, 'k')
     #         axis.set_ylabel('Mean Square Error/Cost')
     #         axis.set_xlabel('Iterations of gradient descent')
-
 
     def mean_normalise(self):
         '''
@@ -147,12 +149,12 @@ class LinearRegression(object):
             warnings.warn('If you used gradient descent, try fitting with inverse transpose')
 
     def durbin_watson(self):
-        squared_errors = (self.targets - self.predictions) ** 2
+        squared_errors = (self.test_targets - self.predictions) ** 2
         sum_of_squares = sum(squared_errors)
         numerator = []
-        for i in range(len(self.targets) - 1):
+        for i in range(len(self.test_targets) - 1):
             numerator.append(
-                ((self.targets[i + 1] - self.predictions[i + 1]) - (self.targets[i] - self.predictions[i])) ** 2)
+                ((self.test_targets[i + 1] - self.predictions[i + 1]) - (self.test_targets[i] - self.predictions[i])) ** 2)
         numerator = sum(numerator)
         durbin_watson = numerator / sum_of_squares
         if durbin_watson < 2.5 and durbin_watson > 1.5:
@@ -167,7 +169,6 @@ class LinearRegression(object):
                 durbin_watson))
 
     def residual_homoscedastity(self):
-        self.std_res = self.residuals / np.std(self.residuals)
         print('Check residual plot!')
         plt.figure()
         sns.set()
@@ -177,8 +178,10 @@ class LinearRegression(object):
         plt.ylabel('Standardized Residuals')
 
     def multicollinearity(self):
-        VIF = pd.Series([variance_inflation_factor(self.data.values, i) for i in range(self.data.shape[1])],
-                        index=list(self.data))
+        data = copy.deepcopy(self.data)
+        data.insert(0, 'Intercept Token', 1)
+        VIF = pd.Series([variance_inflation_factor(data.values, i) for i in range(data.shape[1])],
+                        index=list(data))
         for idx, value in enumerate(VIF[1:]):
             if value > 5:
                 print(
@@ -186,7 +189,7 @@ class LinearRegression(object):
 
     def outlier_func(self):
         self.outliers = []
-        for i in range(self.data.shape[0]):
+        for i in range(self.test_data.shape[0]):
             if np.abs(self.std_res[i]) > 3:
                 self.outliers.append(i)
         if len(self.outliers) == 0:
@@ -266,17 +269,24 @@ class LinearRegression(object):
             self.coef = avg_coef
             self.mean_sq_error = avg_MSE
 
+    def pre_process(self):
+        self.multicollinearity()
 
+    def post_process(self):
+        self.durbin_watson()
+        self.residual_homoscedastity()
+        self.residual_normality()
+        self.outlier_func()
 
-
-'''
-self.durbin_watson()
-self.residual_homoscedastity()
-self.multicollinearity()
-self.outlier_func()
-self.residual_normality()
-'''
-
-
+    '''
+    def p_val(self):
+        # SE_table = copy.deepcopy(self.test_data)
+        # # for column in self.test_data:
+        # for i in range(len(self.test_targets)):
+        #     num = np.sqrt(sum((self.test_targets[i] - self.predictions[i])**2) / (len(self.test_data) - len(list(self.test_data))))
+        #     denom = np.sqrt(sum(self.test_data.loc[:,'CRIM'].values[i] - np.mean(self.test_data.loc[:,'CRIM'])))
+        # print(num/denom)
+        pass
+    '''
 
 

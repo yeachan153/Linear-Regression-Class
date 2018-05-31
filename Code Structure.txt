@@ -1,20 +1,20 @@
 Code skeleton:
 
 1) Check initial assumptions:
-	- Multicollinearity
+	- Multicollinearity (DONE!)
 	- Linearity plots
-2) Train:
+2) Split data (DONE!)
+3) Train:
 	- Cross Validate (DONE!)
+
 	- Regularise
-	- Feature Selection algorithm - Univariate selection chi sq?
-3) Predict - DONE
-	- R^2 (DONE!)
-	- Significant Predictors 
-4) Check post-test assumptions:
-	- Durbin Watson 
-	- Residual Homoscedastity
-	- Outlier_func
-	- residual_normality
-	- Leverage points (Leverage x, std.resid y = cook's distance plot)
-	- Influential points
+4) Predict on TEST DATA - DONE
+	- R^2 (DONE!)5
+5) Check post-test assumptions:
+	- Durbin Watson (DONE!)
+	- Residual Homoscedastity (DONE!)
+	- Outlier_func (DONE!)
+	- residual_normality (DONE!)
+
+
 
