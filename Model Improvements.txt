@@ -1,0 +1,8 @@
+1) Intial Pre Process:
+    - Linearity Plots, add a quadratic predictor? Yes? Then regularise
+    - Remove multicollinear variables
+
+2) Remove features that don't predict much (check normalised coefficients) - minimise MSE
+
+3) Remove leverage/influential points
+
