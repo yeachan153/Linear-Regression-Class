@@ -40,7 +40,7 @@ test.targets = np.delete(test.targets,list(outlier_row))
 # 5)
 test.data['LSTAT^2'] = test.data.loc[:,'LSTAT']**2
 test.data['LSTAT^3'] = test.data.loc[:,'LSTAT']**3
-test.data['RM_log'] = np.log(test.data['RM'])
+test.data['RM'] = np.log(test.data['RM'])
 test.data['LSTATAGE'] = test.data['LSTAT']**2 * test.data['AGE']
 test.data.drop('AGE', 1, inplace = True)
 
@@ -49,12 +49,12 @@ test.pre_process()
 test.original_split(.7)
 test.train(MCC=True, normalise=True, regularise=False)
 test.predict_new(test.data, test.targets)
-print(test.adj_r)
+test.r
 
 '''
 # 7)
 test.predict_new(test.test_data, test.test_targets)
-print(test.adj_r)
+test.r
 test.post_process()
 '''
 
