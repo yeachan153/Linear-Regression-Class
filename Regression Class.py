@@ -164,7 +164,7 @@ class LinearRegression(object):
             self.r = r_squared
             print('Check class.r for R^2')
         else:
-            warnings.warn('If you used gradient descent, try fitting with inverse transpose')
+            warnings.warn('R^2 value is negative')
         top = (1 - r_squared) * (self.data2.shape[0] - 1)
         bottom = self.data2.shape[0] - (self.data2.shape[1] - 1) - 1
         adj_r_squared = 1 - (top / bottom)
@@ -172,7 +172,7 @@ class LinearRegression(object):
             self.adj_r = adj_r_squared
             print('Check class.adj_r for adjusted R^2')
         else:
-            warnings.warn('If you used gradient descent, try fitting with inverse transpose')
+            warnings.warn('R^2 value is negative')
 
     def durbin_watson(self):
         '''
