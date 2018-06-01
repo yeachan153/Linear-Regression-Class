@@ -24,11 +24,16 @@ import pandas as pd
 Putting the data into pandas and creating 1 dataset
 '''
 data = pd.DataFrame(features, columns = columns)
-target
 
-def train_split(data, split = .6):
-    train_data = data.iloc[:round(data.shape[0] * split),:]
-    test_data = data.iloc[round(data.shape[0] * split):,:]
-    return train_data, test_data
+data_whole = copy.deepcopy(data)
+data_whole['target'] = target
 
+'''
+Data Pre-Process
+'''
+
+
+'''
+Data ModifyingA
+'''
 

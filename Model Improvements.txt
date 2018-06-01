@@ -1,8 +1,75 @@
-1) Intial Pre Process:
-    - Linearity Plots, add a quadratic predictor? Yes? Then regularise
-    - Remove multicollinear variables
+Improvements:
+1) Data Processing:
+    - Remove 16 points of MEDV with 50.00 - probably a mistake in the data
+    - Remove columns: 'CHAS', 'AGE', 'ZN' (with respective targets)
+    - Removed 53 rows where variables had absurd outliers (z score > 10), not including categorical variables off course!
 
-2) Remove features that don't predict much (check normalised coefficients) - minimise MSE
+2) Modifications
+    - Baseline model = y ~ 'CRIM'+'ZN'+'INDUS'+'CHAS'+'NOX'+'RM'+'AGE'+'DIS'+'RAD'+'TAX'+'PTRATIO'+'B'+'LSTAT'
+    - New model = y ~ ['CRIM'+'INDUS'+'INDUS^2'+'INDUS^3'+'NOX'+'RM'+'log(RM)'+'DIS'+'sqrt(DIS)'+'RAD'+'TAX'+'PTRATIO'+'B'+'LSTAT'+'LSTAT^2'
+    +'LSTAT^3']
+    - Target variable ('MEDV') is now log('MEDV').
 
-3) Remove leverage/influential points
+Program Procedure (in order):
+1) Instantiate the class:
+    - ClassInstance = LinearRegression(data,np.log(target))
+    - First argument is a pandas DataFrame containing the entire dataset. The second argument is an array of targets.
+
+2)  Pre-Train Check:
+    - ClassInstance.pre_process()
+    - Prints multicollinear variables and their VIF values.
+    - Did not remove multicollinear in our improvements.
+    - Prints a table of columns with sum of missing values (if any).
+
+3) Split data into 70/30 train/validate:
+    ClassInstance.original_split(.7)
+    - This original split is random each time because what we do is assign each index/row of the data a value between 0 - 1, from a uniform
+    distribution. We then pick values (rows) under 0.7 for training, and those over 0.7 for validating. This way we end up with a random
+    70/30 data split.
+    - Returns train_data, train_targets, test_data, test_targets.
+    - REMEMBER! We train our model (including cross validation) PURELY on the train_data and train_targets
+
+4) Train the data:
+    - ClassInstance.train(self, MCC=True, normalise = False, regularise = False)
+    - Normalise the data (feature scaling - so it becomes easier to interpret our regression coefficients). Note, classInstance.data
+    remains changed until reinstantiated.
+    - Cross validate using monte carlo principles (MCC). This process ran 1000 times, and a 70/30 split was used each iteration. It will
+    prompt you to enter custom values everytime.
+    - Regularisation parameter can be inputted (you will be prompted), however I didn't know which value to pick so I didn't use it.
+    - Train prints how much your MSE increased if you cross validated
+    - Train also produces ClassInstance.coef (regression coefficients) and ClassInstance.mean_sq_error.
+
+5) Predict the data using the training data with ClassInstance.coef:
+    - ClassInstance.predict_new(ClassInstance.data, ClassInstance.targets)
+    - Outputs: ClassInstance.r, ClassInstance.adj_r, ClassInstance.predictions
+    - Adjusted R^2 value hovers around 0.8-0.84 for training data. This will change each time because our original train/test split
+    from step 1 is random, as is the cross validation in step 2 to a small degree. However, the latter's effect is minimised because
+    we split/test many times.
+
+6) Predict the data using the testing data made in step 2 with ClassInstance.coef:
+    - ClassInstance.predict_new(ClassInstance.test_data, ClassInstance.test_targets)
+    - Adjusted R^2 fluctuates around 0.65-0.81 for testing data since step 2 is random! However it's usually over 0.7.
+    - Any idea how to minimise fluctuation?
+
+7) Post-Prediction Checks:
+    - ClassInstance.post_process()
+    - WARNING! As of now this function only works with step 4. If your previous line was step 3, step 5 will not work. This will be
+    fixed for flexibility.
+    - Checks for first order autocorrelations between residuals.
+    - Checks residual distribution using Kolmogorov-Smirnov
+    - Outputs residual histogram
+    - Checks for residual outliers. See the indexes on ClassInstance.outliers
+    - Outputs a plot with a loess line, check for residual homoscedasticity.
+
+OPTIONAL FUNCTIONS:
+    1) Check for data point outliers:
+        - ClassInstance.z_scores(self,data,threshold)
+        - Returns the index, text_list of outliers
+        - WARNING! Remove categorical columns from DataFrame before using
+
+    2) Get Descriptives:
+        - ClassInstance.descriptives()
+        - Prints descriptive statistics
+
+
 

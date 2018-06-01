@@ -42,6 +42,20 @@ class LinearRegression(object):
         '''
         print(self.data.describe())
 
+    def z_scores(self,data,threshold):
+        temp_data = copy.deepcopy(data)
+        cols = list(temp_data.columns)
+        for col in cols[1:]:
+            temp_data[col] = (temp_data[col] - temp_data[col].mean()) / temp_data[col].std(ddof=0)
+        outliers = []
+        unique_index = []
+        for column in temp_data:
+            for idx, each_z in enumerate(temp_data[column]):
+                if np.abs(each_z) > threshold:
+                    outliers.append('Index ' + str(idx) + ' in the column ' + column + ' is an outlier')
+                    unique_index.append(idx)
+        return set(unique_index), outliers
+
     def missing_value(self):
         print(self.data.isnull().sum())
 
@@ -211,7 +225,7 @@ class LinearRegression(object):
         if p_val > 0.05:
             print('Residuals normally distributed according to Kolmogorov-Smirnov')
         elif p_val < 0.05:
-            print('Residuals not normally distributed according toKolmogorov-Smirnov - check residual histogram')
+            print('Residuals not normally distributed according to Kolmogorov-Smirnov - check residual histogram')
         plt.figure()
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         sns.distplot(self.std_res)
@@ -219,7 +233,7 @@ class LinearRegression(object):
         plt.xlabel('Standardized Residuals')
         plt.ylabel('Count')
 
-    def train_split(self, split=.6):
+    def train_split(self, split=.7):
         '''
         :param split: Enter the split/train split ratio
         :return: Returns train_data, train_targets, test_data, test_targets
@@ -259,8 +273,8 @@ class LinearRegression(object):
             self.mean_sq_error = Msq
             print('Check class.coef & class.mean_sq_error.')
         elif MCC == True:
-            n_folds = int(input('Enter an integer value of folds'))
-            fold_split = float(input('Enter an the split ratio per fold (0 - 1)'))
+            n_folds = int(input('How many times should I run? Enter a whole number'))
+            fold_split = float(input('Enter the split ratio per round  (0.01 - 0.90)'))
             summed_coef = 0
             summed_MSE = 0
             if regularise == True:
@@ -297,6 +311,7 @@ class LinearRegression(object):
 
     def pre_process(self):
         self.multicollinearity()
+        self.missing_value()
 
     def post_process(self):
         self.durbin_watson()
