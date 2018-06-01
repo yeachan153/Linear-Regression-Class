@@ -284,7 +284,7 @@ class LinearRegression(object):
         coef = self.normal_fit(temp_data2, target, regrate = 0)
         Msq = self.MSE(temp_data2, target, coef)
         if regularise == True and MCC == False:
-            regrate = float(input('Input regularisation rate'))
+            regrate = float(input('Input regularisation parameter'))
             coef = self.normal_fit(temp_data2, target,regrate, regularise = True)
             Msq = self.MSE(temp_data2, target, coef)
         if MCC == False:
@@ -297,7 +297,7 @@ class LinearRegression(object):
             summed_coef = 0
             summed_MSE = 0
             if regularise == True:
-                regrate = float(input('Input regularisation rate'))
+                regrate = float(input('Input regularisation parameter'))
                 for every_fold in range(n_folds):
                     train_data, train_targets, test_data, test_targets = self.train_split(split=fold_split)
                     train_data.insert(0, 'Intercept Token', 1)
