@@ -1,21 +1,9 @@
 '''
 NOTE!
-1) UPDATE scikit-learn
+1) Please update your scikit-learn.
 '''
 
-'''
-TO DO:
-3) regression plot (Natalie)
 
-IMPROVEMENTS:
-3) MAKE EVERYTHING WORK AGAIN! - sort out unhidden functions
-4) Regularization (using normal)
-5) Leverage/Influential points
-6) Maybe feature selection?
-
-self.coef
-self.mean_sq_error
-'''
 import pandas as pd
 import numpy as np
 import copy
@@ -24,7 +12,7 @@ import warnings
 import seaborn as sns
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from scipy.stats import kstest
-from sklearn.model_selection import KFold
+
 
 pd.set_option('precision', 10)
 class LinearRegression(object):
@@ -319,15 +307,5 @@ class LinearRegression(object):
         self.residual_normality()
         self.outlier_func()
 
-    '''
-    def p_val(self):
-        # SE_table = copy.deepcopy(self.test_data)
-        # # for column in self.test_data:
-        # for i in range(len(self.test_targets)):
-        #     num = np.sqrt(sum((self.test_targets[i] - self.predictions[i])**2) / (len(self.test_data) - len(list(self.test_data))))
-        #     denom = np.sqrt(sum(self.test_data.loc[:,'CRIM'].values[i] - np.mean(self.test_data.loc[:,'CRIM'])))
-        # print(num/denom)
-        pass
-    '''
 
 
