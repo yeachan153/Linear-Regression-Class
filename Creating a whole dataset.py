@@ -13,12 +13,14 @@ Loading necessary packages and dependencies
 '''
 
 from sklearn import datasets
+import pandas as pd
+
 boston = datasets.load_boston()
 features = boston.data
 target = boston.target
 columns = boston.feature_names
 # boston.DESCR
-import pandas as pd
+
 
 '''
 Putting the data into pandas and creating 1 dataset

@@ -6,7 +6,7 @@ Improvements:
 
 2) Modifications
     - Baseline model = y ~ 'CRIM'+'ZN'+'INDUS'+'CHAS'+'NOX'+'RM'+'AGE'+'DIS'+'RAD'+'TAX'+'PTRATIO'+'B'+'LSTAT'
-    - New model = y ~ ['CRIM'+'INDUS'+'INDUS^2'+'INDUS^3'+'NOX'+'RM'+'log(RM)'+'DIS'+'sqrt(DIS)'+'RAD'+'TAX'+'PTRATIO'+'B'+'LSTAT'+'LSTAT^2'
+    - New model = y ~ ['CRIM'+'INDUS'+'INDUS^2'+'INDUS^3'+'NOX'+'RM'+'log(RM)'+'DIS'+'RAD'+'TAX'+'PTRATIO'+'B'+'LSTAT'+'LSTAT^2'
     +'LSTAT^3']
     - Target variable ('MEDV') is now log('MEDV').
 
@@ -42,14 +42,16 @@ Program Procedure (in order):
 5) Predict the data using the training data with ClassInstance.coef:
     - ClassInstance.predict_new(ClassInstance.data, ClassInstance.targets)
     - Outputs: ClassInstance.r, ClassInstance.adj_r, ClassInstance.predictions
-    - Adjusted R^2 value hovers around 0.8-0.84 for training data. This will change each time because our original train/test split
+    - Adjusted R^2 value hovers around 0.79-0.86 for training data. This will change each time because our original train/test split
     from step 1 is random, as is the cross validation in step 2 to a small degree. However, the latter's effect is minimised because
     we split/test many times.
+    - WARNING! apply np.exp(ClassInstance.predictions) to scale the housing prices back
 
 6) Predict the data using the testing data made in step 2 with ClassInstance.coef:
     - ClassInstance.predict_new(ClassInstance.test_data, ClassInstance.test_targets)
     - Adjusted R^2 fluctuates around 0.65-0.81 for testing data since step 2 is random! However it's usually over 0.7.
     - Any idea how to minimise fluctuation?
+    - WARNING! apply np.exp(ClassInstance.predictions) to scale the housing prices back
 
 7) Post-Prediction Checks:
     - ClassInstance.post_process()
@@ -62,12 +64,7 @@ Program Procedure (in order):
     - Outputs a plot with a loess line, check for residual homoscedasticity.
 
 OPTIONAL FUNCTIONS:
-    1) Check for data point outliers:
-        - ClassInstance.z_scores(self,data,threshold)
-        - Returns the index, text_list of outliers
-        - WARNING! Remove categorical columns from DataFrame before using
-
-    2) Get Descriptives:
+    1) Get Descriptives:
         - ClassInstance.descriptives()
         - Prints descriptive statistics
 

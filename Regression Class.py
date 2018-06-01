@@ -1,9 +1,9 @@
 '''
-NOTE!
-1) Please update your scikit-learn.
+WARNING!
+1) Please first update your scikit-learn.
 '''
 
-
+from sklearn import datasets
 import pandas as pd
 import numpy as np
 import copy
@@ -12,7 +12,6 @@ import warnings
 import seaborn as sns
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from scipy.stats import kstest
-
 
 pd.set_option('precision', 10)
 class LinearRegression(object):
@@ -45,9 +44,16 @@ class LinearRegression(object):
         return set(unique_index), outliers
 
     def missing_value(self):
+        '''
+        Prints any missing values
+        '''
         print(self.data.isnull().sum())
 
     def original_split(self, split):
+        '''
+        :param split: The split/train ratio.
+        :return: self.data, self.targets, self.test_data, self.test_targets
+        '''
         self.data, self.targets, self.test_data, self.test_targets = self.train_split(split)
         print('Your training data can be accessed in class.data and class.targets. Your test data is class.test_data and class.test_targets')
 
@@ -130,6 +136,11 @@ class LinearRegression(object):
         return data
 
     def predict_new(self, data, targets):
+        '''
+        :param data: DataFrame without target
+        :param targets: Actual targets - used to calculate residuals
+        :return:
+        '''
         data = copy.deepcopy(data)
         self.data2 = data
         self.targets2 = copy.deepcopy(targets)
@@ -141,6 +152,10 @@ class LinearRegression(object):
         print('Check class.predictions, class.resid & class.std_res')
 
     def r_square(self):
+        '''
+        Used to calculate r^2 values
+        :return: self.r, self.adj_r
+        '''
         sum_sq = sum((self.targets2 - self.predictions) ** 2)
         mean_matrix = np.full(self.targets2.shape, np.mean(self.targets2))
         sum_mean = sum((self.targets2 - mean_matrix) ** 2)
@@ -160,6 +175,9 @@ class LinearRegression(object):
             warnings.warn('If you used gradient descent, try fitting with inverse transpose')
 
     def durbin_watson(self):
+        '''
+        Checks for first order autocorrelations of residuals
+        '''
         squared_errors = (self.test_targets - self.predictions) ** 2
         sum_of_squares = sum(squared_errors)
         numerator = []
@@ -180,6 +198,9 @@ class LinearRegression(object):
                 durbin_watson))
 
     def residual_homoscedastity(self):
+        '''
+        Plots the residuals as a scatterplot with a loess line
+        '''
         print('Check residual plot!')
         plt.figure()
         sns.set()
@@ -189,6 +210,9 @@ class LinearRegression(object):
         plt.ylabel('Standardized Residuals')
 
     def multicollinearity(self):
+        '''
+        Prints features which exhibit multicollinear tendencies
+        '''
         data = copy.deepcopy(self.data)
         data.insert(0, 'Intercept Token', 1)
         VIF = pd.Series([variance_inflation_factor(data.values, i) for i in range(data.shape[1])],
@@ -199,6 +223,10 @@ class LinearRegression(object):
                     'The feature ' + VIF.index[idx] + ' shows evidence of multicollinearity.' + ' VIF = ' + str(value))
 
     def outlier_func(self):
+        '''
+        Returns residual outliers
+        :return: self.outliers
+        '''
         self.outliers = []
         for i in range(self.test_data.shape[0]):
             if np.abs(self.std_res[i]) > 3:
@@ -209,6 +237,9 @@ class LinearRegression(object):
             print(str(len(self.outliers)) + ' outliers. Check class.outliers for row indexes')
 
     def residual_normality(self):
+        '''
+        Prints whether residuals were normally distributed. Also prints a histogram of residuals
+        '''
         p_val = kstest(self.std_res, cdf = 'norm')[1]
         if p_val > 0.05:
             print('Residuals normally distributed according to Kolmogorov-Smirnov')
@@ -261,8 +292,8 @@ class LinearRegression(object):
             self.mean_sq_error = Msq
             print('Check class.coef & class.mean_sq_error.')
         elif MCC == True:
-            n_folds = int(input('How many times should I run? Enter a whole number'))
-            fold_split = float(input('Enter the split ratio per round  (0.01 - 0.90)'))
+            n_folds = int(input('How many times should cross validation run? Enter a whole number'))
+            fold_split = float(input('Enter the split ratio per round  (0.20 - 0.90)'))
             summed_coef = 0
             summed_MSE = 0
             if regularise == True:
@@ -298,10 +329,16 @@ class LinearRegression(object):
             self.mean_sq_error = avg_MSE
 
     def pre_process(self):
+        '''
+        Runs pre-predict assumptions test
+        '''
         self.multicollinearity()
         self.missing_value()
 
     def post_process(self):
+        '''
+        Runs post-predict assumptions test
+        '''
         self.durbin_watson()
         self.residual_homoscedastity()
         self.residual_normality()
