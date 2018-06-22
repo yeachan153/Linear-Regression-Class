@@ -12,6 +12,7 @@ ClassInstance.post_process() is also available for use.
 # 1)
 from sklearn import datasets
 import pandas as pd
+from RegressionClass import *
 
 boston = datasets.load_boston()
 features = boston.data
