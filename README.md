@@ -1,7 +1,7 @@
 Deliverables:
 1) Report: 'Report.pdf'
 2) Code: 
-		-'Regression Class.py': Contains the class LinearRegression() 
+		-'RegressionClass.py': Contains the class LinearRegression() 
     -'Data Cleaning and Execution.py': Puts the data into the correct format, cleans it, improves it, and executes after creating
     an instance of LinearRegression()
 3) Readme: Here.
